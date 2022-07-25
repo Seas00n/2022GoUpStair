@@ -1,0 +1,79 @@
+<mujoco model="sustech_biped2d">
+    <compiler angle="degree" coordinate="local" inertiafromgeom="true"/>
+    <default>
+        <joint armature="0" damping="0.0" limited="true" solimplimit="0 .8 .03" solreflimit=".02 1" stiffness="0"/>
+        <geom conaffinity="0" condim="3" contype="1" friction=".9 .1 .1" rgba="0.8 0.6 .4 1" solimp="0.0 0.8 0.01"
+              solref="0.02 1"/>
+    </default>
+    <size nstack="300000" nuser_geom="1"/>
+    <option gravity="0 0 -9.81" timestep="0.002"/>
+    <worldbody>
+        <!--躯干在世界坐标系的位置-->
+        <body name="torso" pos="0 0 0">
+            <joint armature="0" axis="1 0 0" damping="0" limited="false" name="rootx" pos="0 0 0" stiffness="0"
+                   type="slide"/>
+            <joint armature="0" axis="0 0 1" damping="0" limited="false" name="rootz" pos="0 0 0" stiffness="0"
+                   type="slide"/>
+            <joint armature="0" axis="0 -1 0" damping="0" limited="false" name="rooty" pos="0 0 0" stiffness="0"
+                   type="hinge"/>
+            <!--from to 设置拉伸起止点,从000拉到001-->
+            <!--size 设置圆柱半径-->
+            <geom fromto="0 0 0 0 0 1" name="torso" size="0.15" type="capsule"/>
+            <!--不设置inertial会根据几何形状自动推断-->
+            <!--子刚体坐标系位置在父刚体坐标系中的位置-->
+            <body name="lthigh" pos="0 0 0">
+                <joint axis="0 -1 0" damping="0.0" name="lthigh" pos="0 0 0" range="-45 135" stiffness="0"
+                       type="hinge"/>
+                <!--axisangle为旋转对应的xyza，默认即可-->
+                <!--pos为大腿几何中心在父坐标系位置-->
+                <!--size为半径和半轴长-->
+                <geom axisangle="1 0 0 0" name="lthigh" pos="0 0 -0.25" rgba="0 0.4470 0.7410 1"
+                      size="0.1 0.25" type="capsule"/>
+                <inertial pos="0 0 -0.15" mass="10"/>
+                <body name="lshin" pos="0 0 -0.5">
+                    <joint axis="0 -1 0" damping="0.0" name="lshin" pos="0 0 0" range="-135 0" stiffness="0"
+                           type="hinge"/>
+                    <inertial pos="0 0 -0.25" mass="10"/>
+                    <geom axisangle="1 0 0 0" name="lshin" pos="0 0 -0.25" rgba="0.8500 0.3250 0.0980 1"
+                          size="0.1 0.25" type="capsule"/>
+                    <body name="lfoot" pos="0 0 -0.5">
+                        <joint axis="0 -1 0" damping="0.0" name="lfoot" pos="0 0 0" range="-80 80" stiffness="0"
+                               type="hinge"/>
+                        <inertial pos="0 0 0" axisangle="0 -1 0 90" mass="5"/>
+                        <geom axisangle="0 -1 0 1.5707963267948966" name="lfoot" pos="0 0 0" rgba="0.4940  0.1840 0.5560 1"
+                              size="0.1 0.1" type="capsule"/>
+                    </body>
+                </body>
+            </body>
+            <body name="rthigh" pos="0 0 0">
+                <joint axis="0 -1 0" damping="0.0" name="rthigh" pos="0 0 0" range="-45 135" stiffness="0"
+                       type="hinge"/>
+                <inertial pos="0 0 -0.25" mass="10"/>
+                <geom axisangle="0 -1 0 0" name="rthigh" pos="0 0 -0.25" rgba="0.8500 0.3250 0.0980 1"
+                      size="0.1 0.25" type="capsule"/>
+                <body name="rshin" pos="0 0 -0.5">
+                    <joint axis="0 -1 0" damping="0.0" name="rshin" pos="0 0 0" range="-135 0" stiffness="0"
+                           type="hinge"/>
+                    <inertial pos="0 0 -0.25" mass="10"/>
+                    <geom axisangle="0 -1 0 0" name="rshin" pos="0 0 -0.25" rgba="0.4940 0.1840 0.5560 1"
+                          size="0.1 0.25" type="capsule"/>
+                    <body name="rfoot" pos="0 0 -0.5">
+                        <joint axis="0 -1 0" damping="0.0" name="rfoot" pos="0 0 0" range="-80 80" stiffness="0"
+                               type="hinge"/>
+                        <inertial pos="0 0 0" axisangle="0 -1 0 90" mass="5" diaginertia="0.0007 0.0007 0.00009"/>
+                        <geom axisangle="0 -1 0 1.5707963267948966" name="rfoot" pos="0 0 0" rgba="0 0.4470 0.7410 1"
+                              size="0.1 0.1" type="capsule"/>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+    <actuator>
+        <motor ctrllimited="true" ctrlrange="-100.0 100.0" gear="1" joint="lthigh" name="lthigh"/>
+        <motor ctrllimited="true" ctrlrange="-100.0 100.0" gear="1" joint="lshin" name="lshin"/>
+        <motor ctrllimited="true" ctrlrange="-100.0 100.0" gear="1" joint="lfoot" name="lfoot"/>
+        <motor ctrllimited="true" ctrlrange="-100.0 100.0" gear="1" joint="rthigh" name="rthigh"/>
+        <motor ctrllimited="true" ctrlrange="-100.0 100.0" gear="1" joint="rshin" name="rshin"/>
+        <motor ctrllimited="true" ctrlrange="-100.0 100.0" gear="1" joint="rfoot" name="rfoot"/>
+    </actuator>
+</mujoco>
