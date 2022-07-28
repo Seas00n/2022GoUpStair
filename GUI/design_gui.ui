@@ -6,13 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1171</width>
-    <height>915</height>
+    <width>1221</width>
+    <height>923</height>
    </rect>
   </property>
   <property name="font">
    <font>
     <family>微软雅黑</family>
+    <pointsize>15</pointsize>
     <weight>75</weight>
     <bold>true</bold>
    </font>
@@ -28,11 +29,17 @@
    <widget class="QLabel" name="label_title">
     <property name="geometry">
      <rect>
-      <x>430</x>
+      <x>540</x>
       <y>10</y>
-      <width>281</width>
+      <width>101</width>
       <height>16</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
     </property>
     <property name="font">
      <font>
@@ -43,7 +50,7 @@
      </font>
     </property>
     <property name="text">
-     <string>                   Pros GUI</string>
+     <string>Pros GUI</string>
     </property>
    </widget>
    <widget class="QGroupBox" name="groupBox">
@@ -55,15 +62,29 @@
       <height>231</height>
      </rect>
     </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+      <pointsize>15</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="title">
      <string>串口属性</string>
     </property>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>40</x>
+       <x>10</x>
        <y>30</y>
-       <width>261</width>
+       <width>328</width>
        <height>191</height>
       </rect>
      </property>
@@ -72,6 +93,20 @@
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QLabel" name="label_port">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>微软雅黑</family>
+            <pointsize>9</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="text">
            <string>Port</string>
           </property>
@@ -80,10 +115,18 @@
         <item>
          <widget class="QComboBox" name="combo_port">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>1</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>微软雅黑</family>
+            <pointsize>9</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
          </widget>
         </item>
@@ -93,6 +136,20 @@
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QPushButton" name="btn_check">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>微软雅黑</family>
+            <pointsize>9</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="text">
            <string>检测串口</string>
           </property>
@@ -100,6 +157,20 @@
         </item>
         <item>
          <widget class="QPushButton" name="btn_open">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>微软雅黑</family>
+            <pointsize>9</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="text">
            <string>打开串口</string>
           </property>
@@ -107,6 +178,20 @@
         </item>
         <item>
          <widget class="QPushButton" name="btn_close">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>微软雅黑</family>
+            <pointsize>9</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="text">
            <string>关闭串口</string>
           </property>
@@ -115,7 +200,16 @@
        </layout>
       </item>
       <item>
-       <widget class="QTextEdit" name="text_port"/>
+       <widget class="QTextEdit" name="text_port">
+        <property name="font">
+         <font>
+          <family>微软雅黑</family>
+          <pointsize>9</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -129,16 +223,30 @@
       <height>221</height>
      </rect>
     </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+      <pointsize>15</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="title">
      <string>Animation</string>
     </property>
     <widget class="QWidget" name="verticalLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>79</x>
-       <y>19</y>
-       <width>201</width>
-       <height>191</height>
+       <x>69</x>
+       <y>29</y>
+       <width>211</width>
+       <height>181</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="animation_view"/>
@@ -152,6 +260,20 @@
       <width>351</width>
       <height>221</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+      <pointsize>15</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="title">
      <string>Camera</string>
@@ -177,6 +299,20 @@
       <height>831</height>
      </rect>
     </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+      <pointsize>15</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="title">
      <string>Plot_view</string>
     </property>
@@ -200,6 +336,20 @@
       <width>331</width>
       <height>831</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+      <pointsize>15</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="title">
      <string>Others</string>
@@ -233,8 +383,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1171</width>
-     <height>23</height>
+     <width>1221</width>
+     <height>33</height>
     </rect>
    </property>
   </widget>

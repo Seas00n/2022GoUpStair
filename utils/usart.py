@@ -2,7 +2,7 @@ import serial
 import serial.tools.list_ports
 import numpy as np
 import time
-
+import struct
 '''
     串口类的实现参考：https://www.cnblogs.com/-wenli/p/11261109.html
     数据解包实现参考：https://blog.csdn.net/yldmkx/article/details/115482351
@@ -10,31 +10,31 @@ import time
     
 '''
 send_data = {
-    'q_knee_des': [],
-    'qd_knee_des': [],
-    'q_ankle_des': [],
-    'qd_ankle_des': [],
-    'torque_knee_des': [],
-    'torque_ankle_des': [],
-    'terrain_mode': []
+    'q_ankle_des': 0,
+    'qd_ankle_des': 0,
+    'torque_ankle_des': 0,
+    'q_knee_des': 0,
+    'qd_knee_des': 0,
+    'torque_knee_des': 0,
+    'terrain_mode': 0
 }
 read_data = {
-    'q_knee_real': [],
-    'qd_knee_real': [],
-    'q_ankle_real': [],
-    'qd_ankle_real': [],
-    'F_x': [],
-    'F_z': [],
-    'M_y': [],
-    'motion_phase': []
+    'q_ankle_real': 0,
+    'qd_ankle_real': 0,
+    'q_knee_real': 0,
+    'qd_knee_real': 0,
+    'F_x': 0,
+    'F_z': 0,
+    'M_y': 0,
+    'motion_phase': 0
 }
-
 
 def set_send_vec(vec_send):
     global send_data
     count = 0
     for key, value in send_data.items():
         send_data[key] = vec_send[count]
+        count += 1
 
 
 def set_read_vec(vec_read):
@@ -42,17 +42,24 @@ def set_read_vec(vec_read):
     count = 0
     for key, value in read_data.items():
         read_data[key] = vec_read[count]
+        count += 1
 
 
 def set_send_item(key, value):
     global send_data
-    send_data[key] = value
+    if key in send_data:
+        send_data[key] = value
+    else:
+        print("\033[31m [ERROR]Not in serial dict\033[0m")
 
 
 def get_read_item(key):
     global read_data
     return read_data[key]
 
+def get_sent_item(key):
+    global send_data
+    return send_data[key]
 
 def get_read_vec():
     global read_data
@@ -64,23 +71,31 @@ def get_sent_vec():
     return np.array(list(send_data.values()))
 
 
-def analysis_read_data(bytes_read, k_float_2_int=100, b_float_2_int=30000):
+def analysis_read_data(bytes_read, k_float_2_int=100.0, b_float_2_int=30000.0):
     global read_data
-    data = np.frombuffer(bytes_read, dtype=np.uint16)
+    data = np.frombuffer(bytes_read, dtype=np.uint16)  # ndarray uint16
+    print('bytes_read', bytes_read)
     if len(data) == len(read_data):
         data = (data - b_float_2_int) / k_float_2_int
         set_read_vec(data)
+        print('data_read', data)
+        print('-------------------------------')
     else:
         print("\033[33m [Warning]Data Length Incorrect = %d\033[0m" % len(data))
 
 
-def package_send_data(k_float_2_int=100, b_float_2_int=30000):
+def package_send_data(k_float_2_int=100.0, b_float_2_int=30000.0):
     global send_data
     data = get_sent_vec()
+    print('------------------------------------')
+    print('data_send', data)
     data = data * k_float_2_int + b_float_2_int
-    data = data.astype(dtype='uint16')
-    send_byte = bytearray(data.tolist())
+    send_byte = bytearray(data.astype(np.uint16))
+    print('bytes_send', send_byte)
     return send_byte
+
+
+
 
 
 class USART():
@@ -88,7 +103,6 @@ class USART():
         self.port = port
         self.baud_rate = baud_rate
         self.is_open = False
-        test_g = 1
         try:
             USART.print_Available_Com()
             self.ser = serial.Serial(
@@ -130,11 +144,14 @@ class USART():
             print("\033[32m [LOG]Serial is close\033[0m")
 
     def UART_Receive_Data(self):
+        global read_data
         num_read_bytes = len(read_data) * 2
         bytes_read = self.ser.read(num_read_bytes)
         analysis_read_data(bytes_read)
 
     def UART_Transmit_Data(self):
+        global send_data
         num_send_bytes = len(send_data) * 2
         bytes_send = package_send_data()
         self.ser.write(bytes_send)
+
