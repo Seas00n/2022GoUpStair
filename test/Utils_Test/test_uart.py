@@ -4,7 +4,7 @@ import serial
 from utils.usart import *
 from utils.process_communication import *
 '''
-    测试串口通信和波形图显示
+    串口收发和波形图显示
 '''
 
 
