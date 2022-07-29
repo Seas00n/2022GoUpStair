@@ -14,7 +14,7 @@ class Contorl_Method(Enum):
     CPhase_Control = 4
 def main():
     control_method = Contorl_Method.Position_Control
-    if control_method==Contorl_Method.Position_Control:
+    # if control_method==Contorl_Method.Position_Control:
 
     # elif control_method==Contorl_Method.Current_Control:
 
