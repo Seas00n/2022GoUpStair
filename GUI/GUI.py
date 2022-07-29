@@ -153,7 +153,7 @@ class ProsTestSerial(QtWidgets.QMainWindow, Ui_MainWindow):
         curve_q_knee_real = self.plot_curve(
             figure=fig_q_knee,
             pen_color='b',
-            curve_label='q_knee'
+            curve_label='q_knee_real'
         )
 
         win.nextRow()
@@ -174,7 +174,7 @@ class ProsTestSerial(QtWidgets.QMainWindow, Ui_MainWindow):
         curve_q_ankle_real = self.plot_curve(
             figure = fig_q_ankle,
             pen_color='b',
-            curve_label='q_ankle'
+            curve_label='q_ankle_real'
         )
 
         win.nextRow()
@@ -283,8 +283,8 @@ class Linkage(QGraphicsItem):
         self.y_knee = self.y_hip + self.L_thigh * numpy.cos(numpy.deg2rad(q_thigh))
         self.x_ankle = self.x_knee + self.L_shank * numpy.sin(numpy.deg2rad(q_thigh + q_knee))
         self.y_ankle = self.y_knee + self.L_shank * numpy.cos(numpy.deg2rad(q_thigh + q_knee))
-        self.x_toe = self.x_ankle + self.L_foot * numpy.sin(numpy.deg2rad(q_thigh + q_knee + q_ankle))
-        self.y_toe = self.y_ankle + self.L_foot * numpy.cos(numpy.deg2rad(q_thigh + q_knee + q_ankle))
+        self.x_toe = self.x_ankle + self.L_foot * numpy.sin(numpy.deg2rad(q_thigh + q_knee + q_ankle+90.0))
+        self.y_toe = self.y_ankle + self.L_foot * numpy.cos(numpy.deg2rad(q_thigh + q_knee + q_ankle+90.0))
 
     def paint(self, painter, option, widget):
         painter.setPen(QPen(QBrush(Qt.red), 3))

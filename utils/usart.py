@@ -3,12 +3,16 @@ import serial.tools.list_ports
 import numpy as np
 import time
 import struct
+
 '''
     串口类的实现参考：https://www.cnblogs.com/-wenli/p/11261109.html
     数据解包实现参考：https://blog.csdn.net/yldmkx/article/details/115482351
     日志输出实现参考：https://blog.csdn.net/qq_33567641/article/details/82769523
     
 '''
+
+
+
 send_data = {
     'q_ankle_des': 0,
     'qd_ankle_des': 0,
@@ -28,6 +32,7 @@ read_data = {
     'M_y': 0,
     'motion_phase': 0
 }
+
 
 def set_send_vec(vec_send):
     global send_data
@@ -57,9 +62,11 @@ def get_read_item(key):
     global read_data
     return read_data[key]
 
+
 def get_sent_item(key):
     global send_data
     return send_data[key]
+
 
 def get_read_vec():
     global read_data
@@ -93,9 +100,6 @@ def package_send_data(k_float_2_int=100.0, b_float_2_int=30000.0):
     send_byte = bytearray(data.astype(np.uint16))
     print('bytes_send', send_byte)
     return send_byte
-
-
-
 
 
 class USART():
@@ -154,4 +158,3 @@ class USART():
         num_send_bytes = len(send_data) * 2
         bytes_send = package_send_data()
         self.ser.write(bytes_send)
-

@@ -37,8 +37,8 @@ class FSMMailBox(Msg):
         super(FSMMailBox, self).__init__()
         # 根据需求编写，顺序尽量和画图程序保持一致
         self.msg_dict['q_thigh'] = 0
-        self.msg_dict['q_knee'] = 0
-        self.msg_dict['q_ankle'] = 0
+        self.msg_dict['q_knee_real'] = 0
+        self.msg_dict['q_ankle_real'] = 0
         self.msg_dict['f'] = 0
         self.msg_dict['phase'] = 0
         self.msg_dict['state'] = 0

@@ -39,8 +39,8 @@ def main():
         usart6.UART_Receive_Data()
         # 将接收到的数据写入邮箱
         process0_mailbox.set_msg_item('q_thigh',sin_signal1[i]*0.5)
-        process0_mailbox.set_msg_item('q_knee', get_read_item('q_knee_real'))
-        process0_mailbox.set_msg_item('q_ankle', get_read_item('q_ankle_real'))
+        process0_mailbox.set_msg_item('q_knee_real', get_read_item('q_knee_real'))
+        process0_mailbox.set_msg_item('q_ankle_real', get_read_item('q_ankle_real'))
         process0_mailbox.set_msg_item('f', get_read_item('F_z'))
         process0_mailbox.set_msg_item('state', get_read_item('motion_phase'))
         process0_mailbox.set_msg_item('q_knee_des',get_sent_item('q_knee_des'))
