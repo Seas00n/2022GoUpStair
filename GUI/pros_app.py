@@ -3,12 +3,9 @@ import json
 import time
 
 import numpy
-import numpy as np
-import pyqtgraph
 from PyQt5.Qt import *
-from design_gui import *
+from GUI.design_gui import *
 import pyqtgraph as pg
-from design_gui import Ui_MainWindow
 import serial
 import serial.tools.list_ports
 from utils.process_communication import *
@@ -29,17 +26,17 @@ class ProsTestSerial(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_state_init()
         self.set_graph_ui()
         self.set_animation_ui()
-        self.connect_signal()
         self.process1_mailbox = FSMMailBox()
         self.process1_mailbox.build_subscriber()
-
+        self.connect_signal()
 
     def connect_signal(self):
         self.btn_check.clicked.connect(self.btn_check_clicked)
         self.btn_open.clicked.connect(self.btn_open_clicked)
         self.btn_close.clicked.connect(self.btn_close_clicked)
+        self.timer = QTimer()
 
-    def update_data(self):
+    def update_data_with_mailbox(self):
         # 获取最新数据
         # data_new = self.simulation_data()
         msg_new = self.process1_mailbox.read_msg()
@@ -60,8 +57,8 @@ class ProsTestSerial(QtWidgets.QMainWindow, Ui_MainWindow):
             self.curves[key].setData(self.buf_plot[count, :])
             count += 1
         self.linkage.set_angle(self.process1_mailbox.get_msg_item('q_thigh'),
-                               self.process1_mailbox.get_msg_item('q_knee'),
-                               self.process1_mailbox.get_msg_item('q_ankle'))
+                               self.process1_mailbox.get_msg_item('q_knee_real'),
+                               self.process1_mailbox.get_msg_item('q_ankle_real'))
 
     def btn_state_init(self):
         self.btn_check.setEnabled(True)
@@ -91,8 +88,6 @@ class ProsTestSerial(QtWidgets.QMainWindow, Ui_MainWindow):
             self.text_port.insertPlainText("{}开启,输出{}条曲线\r\n".format(self.port,self.NPlots))
             self.btn_check.setEnabled(False)
             self.btn_close.setEnabled(True)
-            self.timer = QTimer()
-            self.timer.timeout.connect(self.update_data)
             self.timer.start(5)
 
     def btn_close_clicked(self):
@@ -203,7 +198,7 @@ class ProsTestSerial(QtWidgets.QMainWindow, Ui_MainWindow):
         curve_f = self.plot_curve(
             figure=fig_f,
             pen_color='b',
-            curve_label='f'
+            curve_label='F_z'
         )
         win.nextRow()
         fig_state = self.figure_config(
@@ -216,11 +211,12 @@ class ProsTestSerial(QtWidgets.QMainWindow, Ui_MainWindow):
         )
         curve_state = self.plot_curve(
             figure=fig_state,
-            curve_label='state',
+            curve_label='motion_mode',
             pen_color='b'
         )
         self.NPlots = len(self.curves)
         self.buf_plot = numpy.zeros((self.NPlots, self.Nsamples))
+        self.plot_index = {key:index for index,key in enumerate(self.curves)}
 
     def figure_config(self, win, label, xrange, yrange, xlim, ylim, grid_show=True):
         figure = win.addPlot()
@@ -307,6 +303,7 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     # 自定义类继承自QWidgets,包含一系列创建桌面应用的UI元素
     w = ProsTestSerial()
+    w.timer.timeout.connect(w.update_data_with_mailbox)
     # 在桌面显示窗口
     w.show()
     # 事件处理器这个时候开始工作。主循环从窗口上接收事件，并把事件派发到应用控件里。

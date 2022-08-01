@@ -76,6 +76,7 @@ class Position_Control_Data_Generater(Gait_Simulation_Data_Generator):
 class Current_Control_Data_Generater(Gait_Simulation_Data_Generator):
     def __init__(self):
         pass
+
 class FSM_Control_Data_Generator(Gait_Simulation_Data_Generator):
     def __init__(self):
         pass

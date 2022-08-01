@@ -1,9 +1,6 @@
 import serial
 import serial.tools.list_ports
 import numpy as np
-import time
-import struct
-
 '''
     串口类的实现参考：https://www.cnblogs.com/-wenli/p/11261109.html
     数据解包实现参考：https://blog.csdn.net/yldmkx/article/details/115482351
@@ -30,7 +27,7 @@ read_data = {
     'F_x': 0,
     'F_z': 0,
     'M_y': 0,
-    'motion_phase': 0
+    'motion_mode': 0
 }
 
 
@@ -158,3 +155,6 @@ class USART():
         num_send_bytes = len(send_data) * 2
         bytes_send = package_send_data()
         self.ser.write(bytes_send)
+
+
+

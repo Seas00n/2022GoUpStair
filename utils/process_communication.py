@@ -39,18 +39,18 @@ class FSMMailBox(Msg):
         self.msg_dict['q_thigh'] = 0
         self.msg_dict['q_knee_real'] = 0
         self.msg_dict['q_ankle_real'] = 0
-        self.msg_dict['f'] = 0
+        self.msg_dict['F_z'] = 0
         self.msg_dict['phase'] = 0
-        self.msg_dict['state'] = 0
+        self.msg_dict['motion_mode'] = 0
         self.msg_dict['terrain_mode'] = 0
         self.msg_dict['q_knee_des']=0
         self.msg_dict['q_ankle_des']=0
 
     def build_subscriber(self):
-        self.data_buf = np.memmap('..\log\main_thread_data.npy', dtype='float32', mode='r', shape=(len(self.msg_dict),))
+        self.data_buf = np.memmap('D:\ProsthesisCode\\2022GoUpStair\log\main_thread_data.npy', dtype='float32', mode='r', shape=(len(self.msg_dict),))
 
     def build_publisher(self):
-        self.data_buf = np.memmap('..\log\main_thread_data.npy', dtype='float32', mode='r+',
+        self.data_buf = np.memmap('D:\ProsthesisCode\\2022GoUpStair\log\main_thread_data.npy', dtype='float32', mode='r+',
                                   shape=(len(self.msg_dict),))
 
 
@@ -61,9 +61,9 @@ class ContinuousPhaseMailBox(Msg):
         self.msg_dict['q_thigh'] = 0
         self.msg_dict['q_knee'] = 0
         self.msg_dict['q_ankle'] = 0
-        self.msg_dict['f'] = 0
+        self.msg_dict['F_z'] = 0
         self.msg_dict['phase'] = 0
-        self.msg_dict['state'] = 0
+        self.msg_dict['motion_mode'] = 0
         self.msg_dict['terrain_mode'] = 0
 
     def build_subscriber(self):
@@ -83,8 +83,8 @@ class HybridControlMailBox(Msg):
         self.msg_dict['f'] = 0
         self.msg_dict['phase'] = 0
         self.msg_dict['state'] = 0
-        self.msg_dict['obs_height'] = 0
-        self.msg_dict['obs_width'] = 0
+        self.msg_dict['obstacle_h'] = 0
+        self.msg_dict['obstacle_w'] = 0
         self.msg_dict['Kp'] = 0
         self.msg_dict['Ki'] = 0
         self.msg_dict['Kd'] = 0
