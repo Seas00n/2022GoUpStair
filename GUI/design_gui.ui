@@ -258,7 +258,7 @@
       <x>20</x>
       <y>510</y>
       <width>351</width>
-      <height>221</height>
+      <height>331</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -281,10 +281,10 @@
     <widget class="QWidget" name="verticalLayoutWidget_2">
      <property name="geometry">
       <rect>
-       <x>19</x>
+       <x>9</x>
        <y>29</y>
-       <width>311</width>
-       <height>181</height>
+       <width>331</width>
+       <height>291</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="camera_view"/>
@@ -365,16 +365,6 @@
      </property>
      <layout class="QVBoxLayout" name="others_view"/>
     </widget>
-   </widget>
-   <widget class="QTextEdit" name="textInformation">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>760</y>
-      <width>301</width>
-      <height>91</height>
-     </rect>
-    </property>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

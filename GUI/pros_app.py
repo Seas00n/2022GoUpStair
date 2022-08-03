@@ -1,8 +1,10 @@
 import sys
-import json
 import time
 
+import matplotlib
 import numpy
+
+matplotlib.use("Qt5Agg")
 from PyQt5.Qt import *
 from GUI.design_gui import *
 import pyqtgraph as pg
@@ -14,6 +16,7 @@ test_count = 0
 L_thigh = 40
 L_shank = 40
 L_foot = 15
+NumPoint = 200
 
 
 # 多重继承
@@ -26,6 +29,7 @@ class ProsTestSerial(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_state_init()
         self.set_graph_ui()
         self.set_animation_ui()
+        self.set_camera_ui()
         self.process1_mailbox = FSMMailBox()
         self.process1_mailbox.build_subscriber()
         self.connect_signal()
@@ -85,7 +89,7 @@ class ProsTestSerial(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             time.sleep(0.1)
             self.ser_open = True
-            self.text_port.insertPlainText("{}开启,输出{}条曲线\r\n".format(self.port,self.NPlots))
+            self.text_port.insertPlainText("{}开启,输出{}条曲线\r\n".format(self.port, self.NPlots))
             self.btn_check.setEnabled(False)
             self.btn_close.setEnabled(True)
             self.timer.start(5)
@@ -104,6 +108,24 @@ class ProsTestSerial(QtWidgets.QMainWindow, Ui_MainWindow):
         win.setScene(scene)
         self.linkage = Linkage()
         scene.addItem(self.linkage)
+
+    def set_camera_ui(self):
+        global NumPoint
+        win = pg.GraphicsLayoutWidget()
+        self.camera_view.addWidget(win)
+        self.NPoints = NumPoint
+        fig_scatter = self.figure_config(
+            win=win,
+            label='Point Cloud',
+            xrange=[-5, 5],
+            yrange=[-5, 5],
+            xlim=[-5, 5],
+            ylim=[-5, 5]
+        )
+        point_cloud = self.plot_scatter(
+            figure=fig_scatter,
+            pen_color='b'
+        )
 
     def set_graph_ui(self):
         # 抗锯齿+背景色
@@ -167,7 +189,7 @@ class ProsTestSerial(QtWidgets.QMainWindow, Ui_MainWindow):
             pen_symbol=QtCore.Qt.PenStyle.DotLine
         )
         curve_q_ankle_real = self.plot_curve(
-            figure = fig_q_ankle,
+            figure=fig_q_ankle,
             pen_color='b',
             curve_label='q_ankle_real'
         )
@@ -216,7 +238,7 @@ class ProsTestSerial(QtWidgets.QMainWindow, Ui_MainWindow):
         )
         self.NPlots = len(self.curves)
         self.buf_plot = numpy.zeros((self.NPlots, self.Nsamples))
-        self.plot_index = {key:index for index,key in enumerate(self.curves)}
+        self.plot_index = {key: index for index, key in enumerate(self.curves)}
 
     def figure_config(self, win, label, xrange, yrange, xlim, ylim, grid_show=True):
         figure = win.addPlot()
@@ -232,9 +254,16 @@ class ProsTestSerial(QtWidgets.QMainWindow, Ui_MainWindow):
         pen = pg.mkPen(pen_color, width=pen_width, style=pen_symbol)
         curve = pg.PlotCurveItem(pen=pen)
         figure.addItem(curve)
-        figure.plot()
         self.curves[curve_label] = curve
         return curve
+
+    def plot_scatter(self, figure, pen_color):
+        pen = pg.mkPen(pen_color)
+        self.scatter = pg.ScatterPlotItem(
+            size=2, pen=pen
+        )
+        figure.addItem(self.scatter)
+        return self.scatter
 
     def fifo_plot_buffer(self, data_new):
         self.buf_plot[:, 0:-1] = self.buf_plot[:, 1:]
@@ -275,12 +304,12 @@ class Linkage(QGraphicsItem):
 
     def set_angle(self, q_thigh, q_knee, q_ankle):
         self.prepareGeometryChange()
-        self.x_knee = self.x_hip + self.L_thigh * numpy.sin(numpy.deg2rad(q_thigh))
-        self.y_knee = self.y_hip + self.L_thigh * numpy.cos(numpy.deg2rad(q_thigh))
-        self.x_ankle = self.x_knee + self.L_shank * numpy.sin(numpy.deg2rad(q_thigh + q_knee))
-        self.y_ankle = self.y_knee + self.L_shank * numpy.cos(numpy.deg2rad(q_thigh + q_knee))
-        self.x_toe = self.x_ankle + self.L_foot * numpy.sin(numpy.deg2rad(q_thigh + q_knee + q_ankle+90.0))
-        self.y_toe = self.y_ankle + self.L_foot * numpy.cos(numpy.deg2rad(q_thigh + q_knee + q_ankle+90.0))
+        self.x_knee = self.x_hip + self.L_thigh * numpy.sin(q_thigh*numpy.pi/180.0)
+        self.y_knee = self.y_hip + self.L_thigh * numpy.cos(q_thigh*numpy.pi/180.0)
+        self.x_ankle = self.x_knee + self.L_shank * numpy.sin((q_thigh + q_knee)*numpy.pi/180.0)
+        self.y_ankle = self.y_knee + self.L_shank * numpy.cos((q_thigh + q_knee)*numpy.pi/180.0)
+        self.x_toe = self.x_ankle + self.L_foot * numpy.sin((q_thigh + q_knee + q_ankle + 90.0)*numpy.pi/180.0)
+        self.y_toe = self.y_ankle + self.L_foot * numpy.cos((q_thigh + q_knee + q_ankle + 90.0)*numpy.pi/180.0)
 
     def paint(self, painter, option, widget):
         painter.setPen(QPen(QBrush(Qt.red), 3))

@@ -78,12 +78,12 @@ def get_sent_vec():
 def analysis_read_data(bytes_read, k_float_2_int=100.0, b_float_2_int=30000.0):
     global read_data
     data = np.frombuffer(bytes_read, dtype=np.uint16)  # ndarray uint16
-    print('bytes_read', bytes_read)
+    # print('bytes_read', bytes_read)
     if len(data) == len(read_data):
         data = (data - b_float_2_int) / k_float_2_int
         set_read_vec(data)
-        print('data_read', data)
-        print('-------------------------------')
+        # print('data_read', data)
+        # print('-------------------------------')
     else:
         print("\033[33m [Warning]Data Length Incorrect = %d\033[0m" % len(data))
 
@@ -91,11 +91,11 @@ def analysis_read_data(bytes_read, k_float_2_int=100.0, b_float_2_int=30000.0):
 def package_send_data(k_float_2_int=100.0, b_float_2_int=30000.0):
     global send_data
     data = get_sent_vec()
-    print('------------------------------------')
-    print('data_send', data)
+    # print('------------------------------------')
+    # print('data_send', data)
     data = data * k_float_2_int + b_float_2_int
     send_byte = bytearray(data.astype(np.uint16))
-    print('bytes_send', send_byte)
+    # print('bytes_send', send_byte)
     return send_byte
 
 

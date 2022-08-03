@@ -10,6 +10,6 @@ def on_press(key):
 
 def on_release(key,):
     if key ==keyboard.Key.esc:
-        print('Program is over')
+        print('\033[36m Process {} is over\033[0m'.format(os.getpid()))
         os.kill(os.getpid(), signal.SIGTERM)
         return False
