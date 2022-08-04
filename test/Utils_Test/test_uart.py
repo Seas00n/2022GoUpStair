@@ -15,7 +15,7 @@ def main():
     sin_signal2 = 1.5 * np.sin(2 * np.pi / 5 * t_vec) + 2
     cos_signal1 = -50*np.cos(t_vec)
     cos_signal2 = 2 * np.cos(2 * np.pi / 3 * t_vec) - 1
-    usart6 = USART(port='COM4', baud_rate=115200)
+    usart6 = USART(port='COM8', baud_rate=115200)
     if not usart6.is_open:
         return -1
 
@@ -34,7 +34,6 @@ def main():
         set_send_item('terrain_mode', 0)
         # 发送串口数据
         usart6.UART_Transmit_Data()
-
         # 串口接收数据
         usart6.UART_Receive_Data()
         # 将接收到的数据写入邮箱
@@ -47,6 +46,7 @@ def main():
         process0_mailbox.set_msg_item('q_ankle_des',get_sent_item('q_ankle_des'))
         # 发送邮箱中的数据
         process0_mailbox.write_msg()
+        print(get_read_item('q_knee_real'))
         time.sleep(5e-3)
 
 if __name__ == '__main__':
