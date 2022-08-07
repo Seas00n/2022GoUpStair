@@ -15,7 +15,7 @@ def main():
     sin_signal2 = 1.5 * np.sin(2 * np.pi / 5 * t_vec) + 2
     cos_signal1 = -50*np.cos(t_vec)
     cos_signal2 = 2 * np.cos(2 * np.pi / 3 * t_vec) - 1
-    usart6 = USART(port='COM8', baud_rate=115200)
+    usart6 = USART()
     if not usart6.is_open:
         return -1
 

@@ -37,13 +37,22 @@ def pros_ctrl_process_task():
     gui_process = Process(target=gui_process_task, args=(msg_dict, lock, pipe))
     camera_imu_process = Process(target=camera_imu_process_task, args=(msg_dict, lock))
     camera_vision_process = Process(target=camera_vision_process_task, args=(msg_dict, lock, pipe))
-    camera_imu_process.start()
-    print("\033[32m [LOG]Create Process \033[0m \033[31m CAMERA_IMU \033[0m :{}".format(camera_imu_process.pid))
-    wait_for_camera_imu(msg_dict)
-    camera_vision_process.start()
-    print("\033[32m [LOG]Create Process \033[0m \033[31m CAMERA \033[0m :{}".format(camera_vision_process.pid))
+    test_camera_vision_process = Process(target=test_camera_vision_process_task, args=(msg_dict, lock, pipe))
+
+    # camera_imu_process.start()
+    # print("\033[32m [LOG]Create Process \033[0m \033[31m CAMERA_IMU \033[0m :{}".format(camera_imu_process.pid))
+    # wait_for_camera_imu(msg_dict)
+
     uart_process.start()
     print("\033[32m [LOG]Create Process \033[0m \033[31m UART \033[0m :{}".format(uart_process.pid))
+    wait_for_uart(msg_dict)
+
+    # camera_vision_process.start()
+    # print("\033[32m [LOG]Create Process \033[0m \033[31m CAMERA \033[0m :{}".format(camera_vision_process.pid))
+
+    test_camera_vision_process.start()
+    print("\033[32m [LOG]Create Process \033[0m \033[31m Test_Pipe \033[0m :{}".format(test_camera_vision_process.pid))
+
     gui_process.start()
     print("\033[32m [LOG]Create Process \033[0m \033[31m GUI \033[0m :{}".format(gui_process.pid))
 
@@ -63,9 +72,11 @@ def pros_ctrl_process_task():
 
 
 def uart_process_task(port, msg_dict, lock):
-    usart6 = USART(port=port, baud_rate=115200)
+    usart6 = USART()
     if not usart6.is_open:
         return -1
+    else:
+        msg_dict['is_uart_ready'] = True
     with keyboard.Listener(on_press=on_press,
                            on_release=partial(on_release, )):
         while True:
@@ -86,6 +97,7 @@ def camera_imu_process_task(msg_dict, lock):
     ref_device_id_vec = np.array(camera_imu_id)
     port_vec, _ = get_port_vec(ref_device_id_vec)
     device_vec, callback_vec, control_vec = open_device(port_vec)
+    msg_dict['is_camera_imu_ready'] = True
     with keyboard.Listener(on_press=on_press,
                            on_release=partial(on_release, )):
         while True:
@@ -124,9 +136,9 @@ def gui_process_task(msg_dict, lock, pipe):
                             data_new[w.plot_index.get('q_knee_real')],
                             data_new[w.plot_index.get('q_ankle_real')])
         pcd_2d = input_pipe.recv()
-        x_data = np.array([1,3,2,1])*0.1
-        y_data = np.array([-1,2,3,1])*0.1
-        w.scatter.setData(10*x_data-2, 10*y_data-2)
+        x_data = np.array([1, 3, 2, 1]) * 0.1
+        y_data = np.array([-1, 2, 3, 1]) * 0.1
+        w.scatter.setData(10 * x_data - 2, 10 * y_data - 2)
 
     w.timer.timeout.connect(lambda: update_data_with_msg_dict(msg_dict, lock))
     w.show()
@@ -166,13 +178,23 @@ def camera_vision_process_task(msg_dict, lock, pipe):
                 angle = msg_dict['imu_angle']
                 lock.release()
                 _, pcd_2d = pcd_to_binary_image(item, angle)
-                pcd_2d_send = pcd_2d[::100,:]
+                pcd_2d_send = pcd_2d[::100, :]
                 output_pipe.send(pcd_2d_send)
                 time.sleep(0.1)
             except queue.Empty:
                 break
     output_pipe.close()
     cam.stopCapture()
+
+
+def test_camera_vision_process_task(msg_dict, lock, pipe):
+    output_pipe, _ = pipe
+    with keyboard.Listener(on_press=on_press,
+                           on_release=partial(on_release, )):
+        while True:
+            pcd_2d_send = np.random.random([700, 2])
+            output_pipe.send(pcd_2d_send)
+            time.sleep(0.1)
 
 
 def set_msg_server(msg_dict):
@@ -198,16 +220,21 @@ def set_msg_server(msg_dict):
     msg_dict['obstacle_h'] = 0
     msg_dict['obstacle_d'] = 0
     msg_dict['imu_angle'] = 0
+    msg_dict['is_uart_ready'] = False
+    msg_dict['is_camera_imu_ready'] = False
     print('\033[32m [LOG]Manager Dict List \033[0m')
     for key, value in msg_dict.items():
         print('\033[4m  {}  \033[0m'.format(key))
 
 
 def wait_for_camera_imu(msg_dict):
-    count = 0
-    while count < 5:
-        if msg_dict['imu_angle'] != 0:
-            count += 1
+    while not msg_dict['is_camera_ready']:
+        continue
+
+
+def wait_for_uart(msg_dict):
+    while not msg_dict['is_uart_ready']:
+        continue
 
 
 if __name__ == '__main__':
