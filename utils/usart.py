@@ -4,13 +4,6 @@ import serial
 import serial.tools.list_ports
 import numpy as np
 
-'''
-    串口类的实现参考：https://www.cnblogs.com/-wenli/p/11261109.html
-    数据解包实现参考：https://blog.csdn.net/yldmkx/article/details/115482351
-    日志输出实现参考：https://blog.csdn.net/qq_33567641/article/details/82769523
-    
-'''
-
 send_data = {
     'q_ankle_des': 0,
     'qd_ankle_des': 0,
@@ -115,16 +108,16 @@ class USART():
     def scan_com(self):
         port_list = list(serial.tools.list_ports.comports())
         if len(port_list) == 0:
-            print("\033[33m [Warning]No port can be used \033[0m")
-            return 0
+            print("\033[31m [ERROR]No port can be used \033[0m")
         for port in port_list:
             try:
                 self.ser = serial.Serial(
-                    port=port,
+                    port=port.device,
                     baudrate=self.baud_rate,
                     parity=serial.PARITY_NONE,
                     stopbits=serial.STOPBITS_ONE,
-                    bytesize=serial.EIGHTBITS, timeout=1e-2
+                    bytesize=serial.EIGHTBITS,
+                    timeout=1e-2
                 )
                 if self.ser.is_open:
                     correct_count = 0
@@ -132,7 +125,7 @@ class USART():
                         self.UART_Transmit_Data()
                         time.sleep(5e-3)
                         c = self.UART_Receive_Data()
-                        correct_count += 5
+                        correct_count += 1
                     if correct_count == 5:
                         self.port = port
                         self.is_open = True
@@ -145,7 +138,6 @@ class USART():
                         continue
             except Exception as e:
                 print("\033[31m [ERROR]Serial not Open | {}\033[0m".format(e))
-
 
     def open_UART(self):
         self.ser.open()

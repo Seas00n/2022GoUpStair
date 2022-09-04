@@ -1,7 +1,8 @@
 import argparse
 import queue
 import time
-from multiprocessing import Process, Manager, Pipe
+from functools import partial
+from multiprocessing import Process, Manager
 
 from PyQt5 import Qt, QtWidgets
 from PyQt5.Qt import *
@@ -16,7 +17,11 @@ from sample_3d_cp import MyListener, pcd_to_binary_image
 import glob
 import cv2
 
+import pyarrow as pa
+import pyarrow.parquet as pq
+
 camera_imu_id = ['038819D6']
+dst_log = "../log/pcd_2d.parquet"
 
 
 def pros_ctrl_process_task():
@@ -31,13 +36,11 @@ def pros_ctrl_process_task():
     lock = msg_server.Lock()
     set_msg_server(msg_dict)
 
-    pipe = Pipe(True)
-
-    uart_process = Process(target=uart_process_task, args=('COM4', msg_dict, lock))
-    gui_process = Process(target=gui_process_task, args=(msg_dict, lock, pipe))
-    camera_imu_process = Process(target=camera_imu_process_task, args=(msg_dict, lock))
-    camera_vision_process = Process(target=camera_vision_process_task, args=(msg_dict, lock, pipe))
-    test_camera_vision_process = Process(target=test_camera_vision_process_task, args=(msg_dict, lock, pipe))
+    uart_process = Process(target=uart_process_task, args=(msg_dict, lock))
+    gui_process = Process(target=gui_process_task, args=(msg_dict, lock))
+    # camera_imu_process = Process(target=camera_imu_process_task, args=(msg_dict, lock))
+    # camera_vision_process = Process(target=camera_vision_process_task, args=(msg_dict, lock))
+    test_camera_vision_process = Process(target=test_camera_vision_process_task, args=(msg_dict, lock))
 
     # camera_imu_process.start()
     # print("\033[32m [LOG]Create Process \033[0m \033[31m CAMERA_IMU \033[0m :{}".format(camera_imu_process.pid))
@@ -71,7 +74,7 @@ def pros_ctrl_process_task():
     gui_process.join()
 
 
-def uart_process_task(port, msg_dict, lock):
+def uart_process_task(msg_dict, lock):
     usart6 = USART()
     if not usart6.is_open:
         return -1
@@ -108,12 +111,10 @@ def camera_imu_process_task(msg_dict, lock):
                 lock.release()
 
 
-def gui_process_task(msg_dict, lock, pipe):
+def gui_process_task(msg_dict, lock):
     QtWidgets.QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     app = QtWidgets.QApplication(sys.argv)
     w = ProsTestSerial()
-    close, input_pipe = pipe
-    close.close()
 
     def update_data_with_msg_dict(d, l):
         data_new = np.zeros(w.NPlots)
@@ -125,7 +126,6 @@ def gui_process_task(msg_dict, lock, pipe):
             else:
                 data_new[count] = 0
             count += 1
-        data_new[0] = d['imu_angle']
         l.release()
         w.fifo_plot_buffer(data_new)
         count = 0
@@ -135,10 +135,10 @@ def gui_process_task(msg_dict, lock, pipe):
         w.linkage.set_angle(data_new[w.plot_index.get('q_thigh')],
                             data_new[w.plot_index.get('q_knee_real')],
                             data_new[w.plot_index.get('q_ankle_real')])
-        pcd_2d = input_pipe.recv()
-        x_data = np.array([1, 3, 2, 1]) * 0.1
-        y_data = np.array([-1, 2, 3, 1]) * 0.1
-        w.scatter.setData(10 * x_data - 2, 10 * y_data - 2)
+        pcd_2d = np.reshape(pcd_2d, [int(np.shape(pcd_2d)[0] / 2), 2])
+        x_data = pcd_2d[:, 0]
+        y_data = pcd_2d[:, 1]
+        w.scatter.setData(x_data, y_data)
 
     w.timer.timeout.connect(lambda: update_data_with_msg_dict(msg_dict, lock))
     w.show()
@@ -187,13 +187,12 @@ def camera_vision_process_task(msg_dict, lock, pipe):
     cam.stopCapture()
 
 
-def test_camera_vision_process_task(msg_dict, lock, pipe):
-    output_pipe, _ = pipe
+def test_camera_vision_process_task(msg_dict, lock):
     with keyboard.Listener(on_press=on_press,
                            on_release=partial(on_release, )):
         while True:
-            pcd_2d_send = np.random.random([700, 2])
-            output_pipe.send(pcd_2d_send)
+            pcd_2d_send = np.random.random([1500, 2])
+            pcd_2d_send = np.reshape(pcd_2d_send, [np.shape(pcd_2d_send)[0] * 2, ])
             time.sleep(0.1)
 
 
@@ -228,12 +227,24 @@ def set_msg_server(msg_dict):
 
 
 def wait_for_camera_imu(msg_dict):
+    count = 0
     while not msg_dict['is_camera_ready']:
+        count += 1
+        time.sleep(2)
+        print("\033[31m [ERROR]No camera can be used \033[0m")
+        if count > 5:
+            break
         continue
 
 
 def wait_for_uart(msg_dict):
+    count = 0
     while not msg_dict['is_uart_ready']:
+        count += 1
+        time.sleep(2)
+        if count > 5:
+            print("\033[31m [ERROR]No UART can be used \033[0m")
+            break
         continue
 
 
